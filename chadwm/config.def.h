@@ -28,9 +28,9 @@ static const int horizpadtabo       = 15;
 static const int scalepreview       = 4;
 static const int tag_preview        = 0;        /* 1 means enable, 0 is off */
 static const int colorfultag        = 1;        /* 0 means use SchemeSel for selected non vacant tag */
-static const char *upvol[]   = { "/usr/bin/pactl", "set-sink-volume", "0", "+5%",     NULL };
-static const char *downvol[] = { "/usr/bin/pactl", "set-sink-volume", "0", "-5%",     NULL };
-static const char *mutevol[] = { "/usr/bin/pactl", "set-sink-mute",   "0", "toggle",  NULL };
+static const char *upvol[]   = { "/usr/bin/pactl", "set-sink-volume", "alsa_output.pci-0000_18_00.6.iec958-stereo", "+5%",     NULL };
+static const char *downvol[] = { "/usr/bin/pactl", "set-sink-volume", "alsa_output.pci-0000_18_00.6.iec958-stereo", "-5%",     NULL };
+static const char *mutevol[] = { "/usr/bin/pactl", "set-sink-mute",   "alsa_output.pci-0000_18_00.6.iec958-stereo", "toggle",  NULL };
 static const char *light_up[] = {"/usr/bin/light", "-A", "5", NULL};
 static const char *light_down[] = {"/usr/bin/light", "-U", "5", NULL};
 static const int new_window_attach_on_end = 0; /*  1 means the new window will attach on the end; 0 means the new window will attach on the front,default is front */
@@ -106,6 +106,8 @@ static const Layout layouts[] = {
     /* symbol     arrange function */
     { "[]=",      tile },    /* first entry is default */
     { "[M]",      monocle },
+    { "|M|",      centeredmaster },
+    { ">M>",      centeredfloatingmaster },
     { "[@]",      spiral },
     { "[\\]",     dwindle },
     { "H[]",      deck },
@@ -115,8 +117,6 @@ static const Layout layouts[] = {
     { "###",      nrowgrid },
     { "---",      horizgrid },
     { ":::",      gaplessgrid },
-    { "|M|",      centeredmaster },
-    { ">M>",      centeredfloatingmaster },
     { "><>",      NULL },    /* no layout function means floating behavior */
     { NULL,       NULL },
 };
@@ -138,7 +138,7 @@ static const Key keys[] = {
     /* modifier                         key         function        argument */
 
   // brightness and audio 
-  {0,       XF86XK_AudioLowerVolume,    spawn, {.v = downvol}},
+	{0,       XF86XK_AudioLowerVolume,    spawn, {.v = downvol}},
 	{0,       XF86XK_AudioMute,           spawn, {.v = mutevol }},
 	{0,       XF86XK_AudioRaiseVolume,    spawn, {.v = upvol}},
 	{0,				XF86XK_MonBrightnessUp,     spawn, {.v = light_up}},
