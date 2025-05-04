@@ -35,19 +35,32 @@ mem() {
 }
 
 wlan() {
-	case "$(cat /sys/class/net/wl*/operstate 2>/dev/null)" in
-	up) printf "^c$black^ ^b$blue^ 󰤨 ^d^%s" " ^c$blue^Connected" ;;
-	down) printf "^c$black^ ^b$blue^ 󰤭 ^d^%s" " ^c$blue^Disconnected" ;;
-	esac
+    case "$(cat /sys/class/net/wl*/operstate 2>/dev/null)" in
+    up) 
+        wifi_name=$(nmcli -t -f active,ssid dev wifi | grep '^yes' | cut -d':' -f2)
+        printf "^c$black^ ^b$blue^ 󰤨 ^d^%s" " ^c$blue^$wifi_name" ;;
+    down) printf "^c$black^ ^b$blue^ 󰤭 ^d^%s" " ^c$blue^WiFi Disconnected" ;;
+    esac
+}
+
+battery() {
+  get_capacity="$(cat /sys/class/power_supply/BAT0/capacity)"
+  printf "^c$blue^   $get_capacity"
+}
+
+brightness() {
+  printf "^c$red^   "
+  printf "^c$red^%.0f\n" $(cat /sys/class/backlight/acpi_video0/brightness)
 }
 
 clock() {
 	printf "^c$black^ ^b$darkblue^ 󱑆 "
   printf "^c$black^^b$blue^$(date +"%a, %d %B %H:%M"| sed 's/  / /g')"
+  printf "^b$black^"
 }
 
 current_network_speed() {
-  interface="eno1"
+  interface="wlan0"
   interval="1"  # Adjust this for longer intervals
 
   # Get initial values
@@ -65,9 +78,13 @@ current_network_speed() {
 }
 
 volume_level() {
-  vol_lvl=$(pactl list sinks | grep '^[[:space:]]Volume:' | head -n $(( $SINK + 1 )) | tail -n 1 | sed -e 's,.* \([0-9][0-9]*%\).*,\1,')
+  vol_lvl=$(pactl get-sink-volume @DEFAULT_SINK@ | grep -oP '\d+(?=%)' | head -n 1)
 	printf "^c$blue^^b$black^ 🔊"
   printf "^c$blue^ $vol_lvl%"
+}
+
+power_menu() {
+    printf "^c$red^ ⏻ ^d^"  # Added spaces before and after the icon
 }
 
 while true; do
@@ -75,5 +92,5 @@ while true; do
   [ $interval = 30 ] || [ $(($interval % 3600)) = 0 ] && updates=$(pkg_updates)
   interval=$((interval + 1))
 
-  sleep 1 && xsetroot -name "$updates $(cpu) $(mem) $(current_network_speed) $(volume_level) $(clock)"
+  sleep 1 && xsetroot -name "$updates $(battery) $(cpu) $(mem) $(wlan) $(current_network_speed) $(brightness) $(volume_level) $(clock)"
 done
