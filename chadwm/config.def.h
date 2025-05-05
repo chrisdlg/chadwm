@@ -1,7 +1,6 @@
 /* See LICENSE file for copyright and license details. */
 
 #include <X11/XF86keysym.h>
-
 /* appearance */
 static const unsigned int borderpx  = 1;        /* border pixel of windows */
 static const unsigned int default_border = 0;   /* to switch back to default border after dynamic border resizing via keybinds */
@@ -28,16 +27,17 @@ static const int horizpadtabo       = 15;
 static const int scalepreview       = 4;
 static const int tag_preview        = 0;        /* 1 means enable, 0 is off */
 static const int colorfultag        = 1;        /* 0 means use SchemeSel for selected non vacant tag */
-static const char *upvol[]   = { "/usr/bin/pactl", "set-sink-volume", "alsa_output.pci-0000_18_00.6.iec958-stereo", "+5%",     NULL };
-static const char *downvol[] = { "/usr/bin/pactl", "set-sink-volume", "alsa_output.pci-0000_18_00.6.iec958-stereo", "-5%",     NULL };
-static const char *mutevol[] = { "/usr/bin/pactl", "set-sink-mute",   "alsa_output.pci-0000_18_00.6.iec958-stereo", "toggle",  NULL };
-static const char *light_up[] = {"/usr/bin/light", "-A", "5", NULL};
-static const char *light_down[] = {"/usr/bin/light", "-U", "5", NULL};
+static const char *upvol[]   = { "/usr/bin/pactl", "set-sink-volume", "@DEFAULT_SINK@", "+5%",     NULL };
+static const char *downvol[] = { "/usr/bin/pactl", "set-sink-volume", "@DEFAULT_SINK@", "-5%",     NULL };
+static const char *mutevol[] = { "/usr/bin/pactl", "set-sink-mute",   "@DEFAULT_SINK@", "toggle",  NULL };
+static const char *light_up[] = { "/bin/sh", "-c", "xrandr --output eDP-1 --brightness $(echo $(xrandr --verbose | grep -i brightness | sed 's/.*Brightness: //') + 0.1 | bc)", NULL };
+static const char *light_down[] = { "/bin/sh", "-c", "xrandr --output eDP-1 --brightness $(echo $(xrandr --verbose | grep -i brightness | sed 's/.*Brightness: //') - 0.1 | bc)", NULL };
+
 static const int new_window_attach_on_end = 0; /*  1 means the new window will attach on the end; 0 means the new window will attach on the front,default is front */
-#define ICONSIZE 19   /* icon size */
+#define ICONSIZE 21   /* icon size */
 #define ICONSPACING 8 /* space between icon and title */
 
-static const char *fonts[]          = {"Iosevka:style:medium:size=12" ,"JetBrainsMono Nerd Font Mono:style:medium:size=19" };
+static const char *fonts[]          = {"JetBrains Mono Medium:size=12" };
 
 // theme
 #include "themes/onedark.h"
@@ -65,10 +65,14 @@ static const char *colors[][3]      = {
 static char *tags[] = {"", "", "3", "4", "5"};
 
 static const char* eww[] = { "eww", "open" , "eww", NULL };
+static const char* networkmenu[] = { "networkmanager_dmenu", NULL };
+static const char* powermenu[] = { "/bin/bash", "-c", "~/.config/chadwm/scripts/power-menu.sh", NULL };
 
 static const Launcher launchers[] = {
     /* command     name to display */
     { eww,         "" },
+    { networkmenu, "󰤨" },
+    { powermenu,   "⏻" },
 };
 
 static const int tagschemes[] = {
@@ -139,8 +143,14 @@ static const Key keys[] = {
 
   // brightness and audio 
 	{0,       XF86XK_AudioLowerVolume,    spawn, {.v = downvol}},
+	{MODKEY,       XK_F2,    spawn, {.v = downvol}},
+
 	{0,       XF86XK_AudioMute,           spawn, {.v = mutevol }},
+	{MODKEY,       XK_F1,    spawn, {.v = mutevol}},
+
 	{0,       XF86XK_AudioRaiseVolume,    spawn, {.v = upvol}},
+	{MODKEY,       XK_F3,    spawn, {.v = upvol}},
+
 	{0,				XF86XK_MonBrightnessUp,     spawn, {.v = light_up}},
 	{0,				XF86XK_MonBrightnessDown,   spawn, {.v = light_down}},
 
@@ -152,7 +162,7 @@ static const Key keys[] = {
         SHCMD("maim --select | xclip -selection clipboard -t image/png")},
 
     { MODKEY,                           XK_c,       spawn,          SHCMD("rofi -show drun") },
-    { MODKEY,                           XK_Return,  spawn,            SHCMD("kitty")},
+    { MODKEY,                           XK_Return,  spawn,          SHCMD("kitty")},
 
     // toggle stuff
     { MODKEY,                           XK_b,       togglebar,      {0} },
@@ -229,17 +239,24 @@ static const Key keys[] = {
     { MODKEY|ShiftMask,                 XK_w,       setborderpx,    {.i = default_border } },
 
     // kill dwm
-    { MODKEY|ControlMask,               XK_q,       spawn,        SHCMD("killall bar.sh chadwm") },
+    { MODKEY|ControlMask,               XK_q,       spawn,          SHCMD("killall bar.sh chadwm") },
 
     // kill window
     { MODKEY,                           XK_q,       killclient,     {0} },
 
     // restart
-    { MODKEY|ShiftMask,                 XK_r,       restart,           {0} },
+    { MODKEY|ShiftMask,                 XK_r,       restart,        {0} },
 
     // hide & restore windows
     { MODKEY,                           XK_e,       hidewin,        {0} },
     { MODKEY|ShiftMask,                 XK_e,       restorewin,     {0} },
+
+    // lock screen
+    { MODKEY|ControlMask,               XK_l,       spawn,          SHCMD("slock")},
+
+    // power menu
+    { MODKEY|ShiftMask,                 XK_x,       spawn,          SHCMD("~/.config/chadwm/scripts/power-menu.sh") }, 
+
 
     TAGKEYS(                            XK_1,                       0)
     TAGKEYS(                            XK_2,                       1)

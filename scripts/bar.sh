@@ -50,7 +50,7 @@ battery() {
 
 brightness() {
   printf "^c$red^   "
-  printf "^c$red^%.0f\n" $(cat /sys/class/backlight/acpi_video0/brightness)
+  printf "^c$red^%.0f\n" $(echo "$(xrandr --verbose | grep -i brightness | sed 's/.*Brightness: //')*100/1" | bc)
 }
 
 clock() {

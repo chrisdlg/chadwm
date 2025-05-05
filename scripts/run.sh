@@ -2,7 +2,7 @@
 
 xrdb merge ~/.Xresources 
 xbacklight -set 10 &
-feh --bg-fill ~/Pictures/wallpapersden.com_new-cool-swirl-4k-art_2880x1800.jpg &
+feh --bg-fill ~/wallpapers/wall-02.webp &
 xset r rate 200 50 &
 picom &
 
