@@ -13,7 +13,7 @@ cpu() {
   cpu_temp=$(cat /sys/devices/platform/coretemp.0/hwmon/hwmon*/temp1_input)
   cpu_temp=$((cpu_temp / 1000))
 
-  printf "^c$black^ ^b$green^ CPU"
+  printf "^c$black^ ^b$green^  "
   printf "^c$white^ ^b$grey^ $cpu_val|$cpu_temp°C"
 }
 
@@ -23,14 +23,14 @@ pkg_updates() {
   # updates=$({ timeout 20 aptitude search '~U' 2>/dev/null || true; } | wc -l)  # apt (ubuntu, debian etc)
 
   if [ -z "$updates" ]; then
-    printf "  ^c$green^    Fully Updated"
+    printf "  ^c$green^   󰚰 Fully Updated"
   else
-    printf "  ^c$green^    $updates updates"
+    printf "  ^c$green^   󰚰 $updates updates"
   fi
 }
 
 mem() {
-  printf "^c$blue^^b$black^  "
+  printf "^c$blue^^b$black^  "
   printf "^c$blue^$(free -h | awk '/^Mem/ { print $3 }' | sed s/i//g)"
 }
 
@@ -45,11 +45,11 @@ wlan() {
 
 battery() {
   get_capacity="$(cat /sys/class/power_supply/BAT0/capacity)"
-  printf "^c$blue^   $get_capacity"
+  printf "^c$blue^ 󰁹  $get_capacity"
 }
 
 brightness() {
-  printf "^c$red^   "
+  printf "^c$red^ 󰃟 "
   printf "^c$red^%.0f\n" $(echo "$(xrandr --verbose | grep -i brightness | sed 's/.*Brightness: //')*100/1" | bc)
 }
 

@@ -37,7 +37,7 @@ static const int new_window_attach_on_end = 0; /*  1 means the new window will a
 #define ICONSIZE 21   /* icon size */
 #define ICONSPACING 8 /* space between icon and title */
 
-static const char *fonts[]          = {"JetBrains Mono Medium:size=12" };
+static const char *fonts[]          = {"MesloLGS NF Regular:size=14" };
 
 // theme
 #include "themes/onedark.h"
