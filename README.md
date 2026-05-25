@@ -123,13 +123,14 @@ eww open eww
 
 # Patches
 
-- systray
+- [systray](https://gitlab.com/-/snippets/2184056)
+- systray iconsize
 - barpadding 
 - bottomstack
 - cfacts
 - dragmfact 
 - dragcfact (took from [bakkeby's build](https://github.com/bakkeby/dwm-flexipatch))
-- fibonacii
+- fibonacci
 - gaplessgrid
 - horizgrid
 - movestack 
