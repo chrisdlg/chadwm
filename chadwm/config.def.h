@@ -37,7 +37,7 @@ static const int new_window_attach_on_end = 0; /*  1 means the new window will a
 #define ICONSIZE 21   /* icon size */
 #define ICONSPACING 8 /* space between icon and title */
 
-static const char *fonts[]          = {"MesloLGS NF Regular:size=14" };
+static const char *fonts[]          = {"MesloLGM Nerd Font:size=12" };
 
 // theme
 #include "themes/onedark.h"
@@ -62,7 +62,7 @@ static const char *colors[][3]      = {
 };
 
 /* tagging */
-static char *tags[] = {"", "", "3", "4", "5"};
+static char *tags[] = {"1", "2", "3", "4", "5", "6", "7"};
 
 static const char* eww[] = { "eww", "open" , "eww", NULL };
 static const char* networkmenu[] = { "networkmanager_dmenu", NULL };

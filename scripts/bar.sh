@@ -23,9 +23,9 @@ pkg_updates() {
   # updates=$({ timeout 20 aptitude search '~U' 2>/dev/null || true; } | wc -l)  # apt (ubuntu, debian etc)
 
   if [ -z "$updates" ]; then
-    printf "  ^c$green^   󰚰 Fully Updated"
+    printf "  ^c$green^ 󰚰 0"
   else
-    printf "  ^c$green^   󰚰 $updates updates"
+    printf "  ^c$green^ 󰚰 %s" "$updates"
   fi
 }
 
@@ -39,13 +39,35 @@ wlan() {
     up) 
         wifi_name=$(nmcli -t -f active,ssid dev wifi | grep '^yes' | cut -d':' -f2)
         printf "^c$black^ ^b$blue^ 󰤨 ^d^%s" " ^c$blue^$wifi_name" ;;
-    down) printf "^c$black^ ^b$blue^ 󰤭 ^d^%s" " ^c$blue^WiFi Disconnected" ;;
+    down) printf "^c$black^ ^b$blue^ 󰤭 ^d^%s" " ^c$blue^Off" ;;
     esac
 }
 
 battery() {
-  get_capacity="$(cat /sys/class/power_supply/BAT0/capacity)"
-  printf "^c$blue^ 󰁹  $get_capacity"
+  acpi_out=$(acpi -b 2>/dev/null | head -n1)
+  bat_status=$(printf '%s' "$acpi_out" | cut -d',' -f1 | cut -d':' -f2 | tr -d ' ')
+  bat_percent=$(printf '%s' "$acpi_out" | grep -oE '[0-9]+%' | head -n1)
+  bat_time=$(printf '%s' "$acpi_out" | grep -oE '[0-9]{2}:[0-9]{2}:[0-9]{2}')
+
+  case "$bat_status" in
+    Charging)    bat_icon="󰂄" ;;
+    Discharging) bat_icon="󰁹" ;;
+    Full)        bat_icon="󰁹" ;;
+    *)           bat_icon="󰁹" ;;
+  esac
+
+  bat_short_time=$(printf '%s' "$bat_time" | cut -d':' -f1,2)
+  case "$bat_status" in
+    Charging)    bat_sym="↑" ;;
+    Discharging) bat_sym="↓" ;;
+    *)           bat_sym="" ;;
+  esac
+
+  if [ -n "$bat_short_time" ] && [ "$bat_status" != "Full" ]; then
+    printf "^c%s^ %s %s%s%s" "$blue" "$bat_icon" "$bat_percent" "$bat_sym" "$bat_short_time"
+  else
+    printf "^c%s^ %s %s" "$blue" "$bat_icon" "$bat_percent"
+  fi
 }
 
 brightness() {
@@ -55,32 +77,14 @@ brightness() {
 
 clock() {
 	printf "^c$black^ ^b$darkblue^ 󱑆 "
-  printf "^c$black^^b$blue^$(date +"%a, %d %B %H:%M"| sed 's/  / /g')"
+  printf "^c$black^^b$blue^ %s" "$(date +'%a %d %B %H:%M')"
   printf "^b$black^"
-}
-
-current_network_speed() {
-  interface="wlan0"
-  interval="1"  # Adjust this for longer intervals
-
-  # Get initial values
-  rx1=$(cat /sys/class/net/$interface/statistics/rx_bytes)
-  tx1=$(cat /sys/class/net/$interface/statistics/tx_bytes)
-  sleep $interval
-  rx2=$(cat /sys/class/net/$interface/statistics/rx_bytes)
-  tx2=$(cat /sys/class/net/$interface/statistics/tx_bytes)
-
-  # Calculate the difference to get the speed
-  rx_speed=$(( ($rx2 - $rx1) / $interval * 8 / 1048576 ))
-  tx_speed=$(( ($tx2 - $tx1) / $interval * 8 / 1048576 ))
-	printf "^c$blue^^b$black^ ⬇️⬆️"
-  printf "^c$blue^$rx_speed|$tx_speed"
 }
 
 volume_level() {
   vol_lvl=$(pactl get-sink-volume @DEFAULT_SINK@ | grep -oP '\d+(?=%)' | head -n 1)
 	printf "^c$blue^^b$black^ 🔊"
-  printf "^c$blue^ $vol_lvl%"
+  printf "^c%s^ %s%%" "$blue" "$vol_lvl"
 }
 
 power_menu() {
@@ -92,5 +96,5 @@ while true; do
   [ $interval = 30 ] || [ $(($interval % 3600)) = 0 ] && updates=$(pkg_updates)
   interval=$((interval + 1))
 
-  sleep 1 && xsetroot -name "$updates $(battery) $(cpu) $(mem) $(wlan) $(current_network_speed) $(brightness) $(volume_level) $(clock)"
+  sleep 1 && xsetroot -name "$updates $(battery) $(cpu) $(mem) $(wlan) $(brightness) $(volume_level) $(clock)"
 done
