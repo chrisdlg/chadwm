@@ -41,7 +41,7 @@ static const int new_window_attach_on_end = 0; /*  1 means the new window will a
 static const char *fonts[]          = {"MesloLGM Nerd Font:size=12" };
 
 // theme
-#include "themes/tundra.h"
+#include "themes/onedark.h"
 
 static const char *colors[][3]      = {
     /*                     fg       bg      border */
